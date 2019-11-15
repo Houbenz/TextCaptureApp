@@ -21,12 +21,13 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
     private static Paint textPaint;
     private static Paint rectPaint;
     private final TextBlock text;
-    public OcrGraphic(GraphicOverlay overlay,TextBlock text) {
+
+     OcrGraphic(GraphicOverlay overlay,TextBlock text) {
         super(overlay);
         this.text=text;
 
 
-        if(rectPaint != null ) {
+        if(rectPaint == null ) {
 
             rectPaint = new Paint();
             rectPaint.setColor(REC_COLOR);
@@ -34,7 +35,7 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
             rectPaint.setStrokeWidth(4.0f);
         }
 
-        if(textPaint != null ){
+        if(textPaint == null ){
 
             textPaint = new Paint();
             textPaint.setColor(TEXT_COLOR);
@@ -45,7 +46,6 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
 
     }
 
-
     public int getId() {
         return id;
     }
@@ -54,6 +54,9 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
         this.id = id;
     }
 
+    public TextBlock getTextBlock() {
+        return text;
+    }
 
     @Override
     public void draw(Canvas canvas) {

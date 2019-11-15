@@ -36,7 +36,7 @@ import butterknife.ButterKnife;
 public class CaptureTextActivity extends AppCompatActivity {
 
 
-    private CameraSource cameraSource;
+     CameraSource cameraSource;
     @BindView(R.id.preview)
      CameraSourcePreview preview;
     @BindView(R.id.graphicOverlay)
@@ -70,7 +70,6 @@ public class CaptureTextActivity extends AppCompatActivity {
         }else {
 
                 requestCameraPermission();
-
         }
 
         Snackbar.make(graphicOverlay, "Tap to Speak. Pinch/Stretch to zoom",
@@ -127,9 +126,6 @@ public class CaptureTextActivity extends AppCompatActivity {
 
 
     }
-
-
-
 
     private void startCameraSource() throws SecurityException {
         // check that the device has play services available.

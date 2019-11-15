@@ -12,12 +12,15 @@ public class OcrProcessorDetector implements Detector.Processor<TextBlock> {
 
 
     private GraphicOverlay<OcrGraphic> graphicOverlay;
+
     OcrProcessorDetector(GraphicOverlay<OcrGraphic> graphicOverlay){
         this.graphicOverlay=graphicOverlay;
     }
 
     @Override
     public void receiveDetections(Detector.Detections<TextBlock> detections) {
+
+        graphicOverlay.clear();
 
         SparseArray<TextBlock> items=detections.getDetectedItems();
 
@@ -30,17 +33,11 @@ public class OcrProcessorDetector implements Detector.Processor<TextBlock> {
                 OcrGraphic graphic = new OcrGraphic(graphicOverlay,item);
                 graphicOverlay.add(graphic);
             }
-
         }
-
     }
-
 
     @Override
     public void release() {
-
         graphicOverlay.clear();
     }
-
-
 }
