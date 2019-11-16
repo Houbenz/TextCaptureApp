@@ -60,6 +60,15 @@ public class GraphicOverlay<T extends GraphicOverlay.Graphic> extends View {
      */
     public static abstract class Graphic {
         private GraphicOverlay mOverlay;
+        private boolean isCaptured=false;
+
+        public boolean isCaptured() {
+            return isCaptured;
+        }
+
+        public void setCaptured(boolean captured) {
+            isCaptured = captured;
+        }
 
         public Graphic(GraphicOverlay overlay) {
             mOverlay = overlay;
@@ -78,6 +87,10 @@ public class GraphicOverlay<T extends GraphicOverlay.Graphic> extends View {
          * @param canvas drawing canvas
          */
         public abstract void draw(Canvas canvas);
+
+
+
+        public abstract void updateDraw(Canvas canvas);
 
         /**
          * Returns true if the supplied coordinates are within this graphic.
@@ -219,7 +232,10 @@ public class GraphicOverlay<T extends GraphicOverlay.Graphic> extends View {
             }
 
             for (Graphic graphic : graphics) {
-                graphic.draw(canvas);
+                if(graphic.isCaptured)
+                    graphic.updateDraw(canvas);
+                else
+                    graphic.draw(canvas);
             }
         }
     }

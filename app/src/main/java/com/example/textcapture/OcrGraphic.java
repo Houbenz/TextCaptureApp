@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.util.Log;
 
 import com.example.textcapture.ui.camera.GraphicOverlay;
 import com.google.android.gms.vision.text.Text;
@@ -18,6 +19,7 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
     private int id ;
     private static final int TEXT_COLOR = Color.WHITE;
     private static final int REC_COLOR =Color.RED;
+    private static final int GREEN_COLOR =Color.GREEN;
     private static Paint textPaint;
     private static Paint rectPaint;
     private final TextBlock text;
@@ -59,6 +61,19 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
     }
 
     @Override
+    public boolean contains(float x, float y) {
+
+        if(text == null) {
+            return false;
+        }
+        RectF rect = new RectF(text.getBoundingBox());
+        rect=translateRect(rect);
+
+        return rect.contains(x,y);
+    }
+
+
+    @Override
     public void draw(Canvas canvas) {
 
         if(text == null ){
@@ -74,14 +89,34 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
         for(Text currentText : components){
             float left = translateX(currentText.getBoundingBox().left);
             float bottom = translateY(currentText.getBoundingBox().bottom);
-            canvas.drawText(text.getValue(),left,bottom,textPaint);
+            canvas.drawText(currentText.getValue(),left,bottom,textPaint);
 
         }
 
     }
 
     @Override
-    public boolean contains(float x, float y) {
-        return false;
+    public void updateDraw(Canvas canvas) {
+
+
+        if(text == null ){
+            return;
+        }
+
+        Log.i("HOHO","updating the draw");
+
+        rectPaint.setColor(GREEN_COLOR);
+        RectF rect = new RectF(text.getBoundingBox());
+        rect=translateRect(rect);
+        canvas.drawRect(rect,rectPaint);
+
+        List<? extends Text> components=text.getComponents();
+
+        for(Text currentText : components){
+            float left = translateX(currentText.getBoundingBox().left);
+            float bottom = translateY(currentText.getBoundingBox().bottom);
+            canvas.drawText(currentText.getValue(),left,bottom,textPaint);
+
+        }
     }
 }

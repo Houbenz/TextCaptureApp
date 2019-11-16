@@ -12,10 +12,16 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.widget.Toast;
@@ -25,10 +31,12 @@ import com.example.textcapture.ui.camera.GraphicOverlay;
 import com.example.textcapture.ui.camera.CameraSource;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -41,6 +49,9 @@ public class CaptureTextActivity extends AppCompatActivity {
      CameraSourcePreview preview;
     @BindView(R.id.graphicOverlay)
      GraphicOverlay<OcrGraphic> graphicOverlay;
+
+
+    private ArrayList<String> texts=new ArrayList<String>();
 
     private static final int RC_HANDLE_CAMERA_PER= 2;
     private static final int RC_HANDLE_GMS = 9001;
@@ -59,6 +70,7 @@ public class CaptureTextActivity extends AppCompatActivity {
         setContentView(R.layout.activity_capture_text);
         ButterKnife.bind(this);
 
+
         boolean autoFocus=true;
         boolean autoFlash=false;
 
@@ -72,11 +84,17 @@ public class CaptureTextActivity extends AppCompatActivity {
                 requestCameraPermission();
         }
 
+
+
+        gestureDetector = new GestureDetector(this, new CaptureGestureDetector());
+
         Snackbar.make(graphicOverlay, "Tap to Speak. Pinch/Stretch to zoom",
                 Snackbar.LENGTH_LONG)
                 .show();
 
     }
+
+
 
     private void requestCameraPermission(){
 
@@ -208,4 +226,66 @@ public class CaptureTextActivity extends AppCompatActivity {
                 .setPositiveButton(R.string.ok, listener)
                 .show();
     }
+
+
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+
+        boolean c = gestureDetector.onTouchEvent(event);
+        return c || super.onTouchEvent(event);
+    }
+
+    private boolean onTap(float rawX, float rawY) {
+
+        OcrGraphic graphic=graphicOverlay.getGraphicAtLocation(rawX,rawY);
+
+
+        TextBlock text= null;
+
+        if(graphic != null){
+
+            text=graphic.getTextBlock();
+
+            if (text != null && text.getValue() != null){
+                Log.d(TAG,"Text data is being spoken! "+ text.getValue());
+
+                //show the text inside the tapped box
+                Toast.makeText(getApplicationContext(),text.getValue(),Toast.LENGTH_LONG).show();
+                //transfers the tapped word to the main activity
+
+                texts.add(text.getValue());
+
+
+                Log.d("HOHO",texts.get(texts.size()-1));
+
+            }
+            else {
+                Log.d(TAG,"Text data is null");
+            }
+
+        }else {
+            Log.d(TAG,"No Text detected");
+        }
+        return text != null;
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        Intent intent = getIntent();
+        intent.putStringArrayListExtra("texts",texts);
+        setResult(RESULT_OK,intent);
+
+        finish();
+    }
+
+    private class CaptureGestureDetector extends GestureDetector.SimpleOnGestureListener{
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent e) {
+            return onTap(e.getRawX(),e.getRawY()) || super.onSingleTapConfirmed(e);
+        }
+    }
+
+
 }
