@@ -255,10 +255,6 @@ public class CaptureTextActivity extends AppCompatActivity {
                 //transfers the tapped word to the main activity
 
                 texts.add(text.getValue());
-
-
-                Log.d("HOHO",texts.get(texts.size()-1));
-
             }
             else {
                 Log.d(TAG,"Text data is null");
