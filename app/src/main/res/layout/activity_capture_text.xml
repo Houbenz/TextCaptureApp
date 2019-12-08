@@ -5,7 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CaptureTextActivity">
+    tools:context=".CaptureTextActivity"
+    android:id="@+id/mainLayout">
 
     <com.example.textcapture.ui.camera.CameraSourcePreview
         android:id="@+id/preview"

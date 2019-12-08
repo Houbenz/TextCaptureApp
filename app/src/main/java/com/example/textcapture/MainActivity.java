@@ -7,6 +7,7 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CancellationSignal;
@@ -39,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
     public static final int CREATE_FILE_REQUEST_CODE=20;
 
 
+    byte[] data;
+
     private Uri fileUri;
 
     @BindView(R.id.scanButton)
@@ -56,9 +59,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-
-
     }
+
 
     @OnClick(R.id.scanButton)
     public void scanText() {
@@ -125,6 +127,7 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 //Received text from capture activity now is being displayed in textview
                 ArrayList<String> texts = data.getStringArrayListExtra("texts");
+                //this.data =data.getByteArrayExtra("data");
 
                 if (texts != null && !texts.isEmpty()) {
 

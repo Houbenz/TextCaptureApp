@@ -12,25 +12,28 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.RectF;
+import android.graphics.Rect;
 import android.hardware.Camera;
 import android.os.Bundle;
-import android.speech.tts.TextToSpeech;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.textcapture.ui.camera.CameraSource;
 import com.example.textcapture.ui.camera.CameraSourcePreview;
 import com.example.textcapture.ui.camera.GraphicOverlay;
-import com.example.textcapture.ui.camera.CameraSource;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 import com.google.android.material.snackbar.Snackbar;
@@ -64,12 +67,18 @@ public class CaptureTextActivity extends AppCompatActivity {
     private GestureDetector gestureDetector;
     private ScaleGestureDetector scaleGestureDetector;
 
+    private Paint rectPaint;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_capture_text);
         ButterKnife.bind(this);
 
+        rectPaint = new Paint();
+        rectPaint.setColor(Color.RED);
+        rectPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        rectPaint.setStrokeWidth(5.0f);
 
         boolean autoFocus=true;
         boolean autoFlash=false;
@@ -92,7 +101,9 @@ public class CaptureTextActivity extends AppCompatActivity {
                 Snackbar.LENGTH_LONG)
                 .show();
 
+
     }
+
 
 
 
@@ -140,8 +151,14 @@ public class CaptureTextActivity extends AppCompatActivity {
                 .setFocusMode(autoFocus ? (Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO):null)
                 .build();
 
-        textRecognizer.setProcessor(new OcrProcessorDetector(graphicOverlay));
 
+        /*cameraSource=new CameraSource.Builder(getApplicationContext(),textRecognizer)
+                .setFacing(CameraSource.CAMERA_FACING_BACK)
+                .setRequestedPreviewSize(1280,1024)
+                .setAutoFocusEnabled(true)
+                .setRequestedFps(15.0f)
+                .build();*/
+        textRecognizer.setProcessor(new OcrProcessorDetector(graphicOverlay));
 
     }
 
@@ -238,6 +255,7 @@ public class CaptureTextActivity extends AppCompatActivity {
 
     private boolean onTap(float rawX, float rawY) {
 
+     /*
         OcrGraphic graphic=graphicOverlay.getGraphicAtLocation(rawX,rawY);
 
 
@@ -263,8 +281,42 @@ public class CaptureTextActivity extends AppCompatActivity {
         }else {
             Log.d(TAG,"No Text detected");
         }
-        return text != null;
+
+
+*/
+
+        cameraSource.takePicture(() -> {
+
+        }, data -> {
+
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inMutable=true;
+
+            Bitmap bitmap= BitmapFactory.decodeByteArray(data,0,data.length,options);
+
+            Frame frame = new Frame.Builder().setBitmap(bitmap).build();
+
+            TextRecognizer textRecognizer = new TextRecognizer.Builder(getApplicationContext()).build();
+
+            SparseArray<TextBlock>  items =textRecognizer.detect(frame);
+
+            cameraSource.stop();
+
+            Canvas tempCanvas = new Canvas(bitmap);
+
+            tempCanvas.drawBitmap(bitmap,0,0,null);
+
+            for (int i=0;i<items.size();i++){
+                texts.add(items.get(i).getValue());
+            }
+
+
+        });
+
+
+        return true;
     }
+
 
     @Override
     public void onBackPressed() {
