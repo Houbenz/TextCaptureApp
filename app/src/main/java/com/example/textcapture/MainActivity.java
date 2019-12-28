@@ -1,36 +1,28 @@
 package com.example.textcapture;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.viewpager.widget.ViewPager;
 
 import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.CancellationSignal;
 import android.os.Environment;
-import android.os.ParcelFileDescriptor;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
+import android.view.MenuItem;
 import android.widget.Toast;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileDescriptor;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.net.URI;
-import java.util.ArrayList;
+import com.example.textcapture.adapter.PageAdapter;
+import com.example.textcapture.viewmodel.TextViewModel;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import org.w3c.dom.Text;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -43,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     byte[] data;
 
     private Uri fileUri;
-
+/*
     @BindView(R.id.scanButton)
     Button scanButton;
 
@@ -52,6 +44,16 @@ public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.saveFile)
     Button saveData;
+*/
+
+
+    private TextViewModel viewModel;
+
+    @BindView(R.id.viewPager)
+    ViewPager viewPager;
+
+    @BindView(R.id.bottomNavigationView)
+    BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,15 +61,75 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        PageAdapter pageAdapter = new PageAdapter(getSupportFragmentManager());
+
+        viewPager.setAdapter(pageAdapter);
+
+        viewModel= ViewModelProviders.of(this).get(TextViewModel.class);
+
+
+        viewModel.getCurrentPage().observe(this,currentPage -> {
+            viewPager.setCurrentItem(currentPage);
+        });
+
+
+        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                switch (position){
+
+                    case 0:
+
+                        bottomNavigationView.getSelectedItemId();
+
+                        ; break;
+                    case 1: break;
+                }
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+
+
+        bottomNavigationView.setOnNavigationItemSelectedListener(menuItem -> {
+
+            menuItem.setChecked(false);
+
+            switch (menuItem.getItemId())
+            {
+                case R.id.scan:
+                    viewPager.setCurrentItem(0,true);
+                    menuItem.setChecked(true);
+                    break;
+
+                case R.id.copyText:
+                    viewPager.setCurrentItem(1,true);
+                    menuItem.setChecked(true);
+                    break;
+            }
+
+            return false;});
+
     }
 
-
+/*
     @OnClick(R.id.scanButton)
     public void scanText() {
         Intent intent = new Intent(getApplicationContext(), CaptureTextActivity.class);
         startActivityForResult(intent, REQUEST_CODE);
     }
+  */
 
+/*
     @OnClick(R.id.saveFile)
     public void saveFileOnClick(){
         int rc= ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -83,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
             requestWritePermission();
         }
     }
-
+*/
 
     /**
      * Check if is storage is available
@@ -118,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
      * @param requestCode
      * @param resultCode
      * @param data
-     */
+     *//*
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -147,12 +209,12 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
+*/
 
     /**
      * write to file created in OnActivityResult the data received
      * @param uri
-     */
+     *//*
     private void writeToFile(Uri uri){
         if(uri != null){
             try {
@@ -171,7 +233,7 @@ public class MainActivity extends AppCompatActivity {
         }else
             Toast.makeText(getApplicationContext(),"An error occured" ,Toast.LENGTH_LONG).show();
     }
-
+*/
 
 
     private void requestWritePermission(){

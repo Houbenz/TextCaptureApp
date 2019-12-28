@@ -67,18 +67,11 @@ public class CaptureTextActivity extends AppCompatActivity {
     private GestureDetector gestureDetector;
     private ScaleGestureDetector scaleGestureDetector;
 
-    private Paint rectPaint;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_capture_text);
         ButterKnife.bind(this);
-
-        rectPaint = new Paint();
-        rectPaint.setColor(Color.RED);
-        rectPaint.setStyle(Paint.Style.FILL_AND_STROKE);
-        rectPaint.setStrokeWidth(5.0f);
 
         boolean autoFocus=true;
         boolean autoFlash=false;
@@ -94,17 +87,14 @@ public class CaptureTextActivity extends AppCompatActivity {
         }
 
 
-
         gestureDetector = new GestureDetector(this, new CaptureGestureDetector());
 
-        Snackbar.make(graphicOverlay, "Tap to Speak. Pinch/Stretch to zoom",
+        Snackbar.make(graphicOverlay, "Tap to capture text, press return button to finsih",
                 Snackbar.LENGTH_LONG)
                 .show();
 
 
     }
-
-
 
 
     private void requestCameraPermission(){
@@ -323,6 +313,7 @@ public class CaptureTextActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         intent.putStringArrayListExtra("texts",texts);
+        intent.putExtra("page",1);
         setResult(RESULT_OK,intent);
 
         finish();

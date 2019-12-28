@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ExportTextFragment">
+
+
+    <Button
+        android:id="@+id/scanBtn"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_below="@+id/title"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center"
+        android:layout_marginTop="107dp"
+        android:background="@drawable/round_button"
+        android:gravity="center"
+        android:padding="8dp"
+        android:text="Start scanning"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="111dp"
+        android:fontFamily="sans-serif-light"
+        android:text="Text Scanner"
+        android:textAlignment="center"
+        android:textAllCaps="true"
+        android:textColor="@color/semi_white"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+</RelativeLayout>
