@@ -13,6 +13,10 @@
     <string name="ocr_success">Text read successfully</string>
     <string name="ocr_failure">No text captured</string>
     <string name="ocr_error">"Error reading text: %1$s"</string>
+    <string name="open_navigation">navigation opened</string>
+    <string name="close_navigation">navigation closed</string>
+    <string name="app_url">https://play.google.com/store/apps/details?id=com.houbenz.android.lifesimulator</string>
+
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

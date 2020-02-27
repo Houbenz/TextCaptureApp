@@ -2,29 +2,37 @@ package com.example.textcapture;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.ViewPager;
 
 import android.Manifest;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.example.textcapture.adapter.PageAdapter;
 import com.example.textcapture.viewmodel.TextViewModel;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView;
 
-import org.w3c.dom.Text;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements  NavigationView.OnNavigationItemSelectedListener {
 
 
     public static final int REQUEST_CODE = 15;
@@ -55,11 +63,51 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.bottomNavigationView)
     BottomNavigationView bottomNavigationView;
 
+
+    private InterstitialAd interstitialAd;
+
+    @BindView(R.id.adView)
+    AdView adView;
+
+    @BindView(R.id.toolbar)
+     Toolbar toolbar;
+
+    @BindView(R.id.drawerLayout)
+    DrawerLayout drawerLayout;
+
+    @BindView(R.id.navigationView)
+    NavigationView navigationView;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        //to load banner ad
+        MobileAds.initialize(this, initializationStatus -> {
+
+        });
+        adView.loadAd(new AdRequest.Builder().build());
+
+
+
+        setSupportActionBar(toolbar);
+
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this,drawerLayout,toolbar,
+                R.string.open_navigation,R.string.close_navigation);
+
+        drawerLayout.setDrawerListener(toggle);
+        toggle.syncState();
+        navigationView.setNavigationItemSelectedListener(this);
+
+
+
+        //to add the interstitial ad;
+        interstitialAd=new InterstitialAd(this);
+        interstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+        //interstitialAd.loadAd(new AdRequest.Builder().build());
 
         PageAdapter pageAdapter = new PageAdapter(getSupportFragmentManager());
 
@@ -68,8 +116,27 @@ public class MainActivity extends AppCompatActivity {
         viewModel= ViewModelProviders.of(this).get(TextViewModel.class);
 
 
+
+        //for loading the ad after being shown the first time
         viewModel.getCurrentPage().observe(this,currentPage -> {
             viewPager.setCurrentItem(currentPage);
+            if(currentPage == 1 ){
+                interstitialAd.loadAd(new AdRequest.Builder().build());
+                Log.i("LOOL","here");
+            }
+        });
+
+
+        //to show the ad  when the data is exported to the fragment
+        viewModel.getTexts().observe(this,texts ->  {
+            if(texts !=null){
+                if(interstitialAd.isLoaded()){
+                    interstitialAd.show();
+                }else {
+                    Log.i("LOOL","didnt show yet");
+                }
+            }
+
         });
 
 
@@ -213,7 +280,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * write to file created in OnActivityResult the data received
-     * @param uri
+     * @param
      *//*
     private void writeToFile(Uri uri){
         if(uri != null){
@@ -242,6 +309,35 @@ public class MainActivity extends AppCompatActivity {
         if(! ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.WRITE_EXTERNAL_STORAGE)){
             ActivityCompat.requestPermissions(this,permissions,HANDLE_WRITE_PER);
         }
+    }
+
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+
+
+        switch (menuItem.getItemId()){
+            case R.id.review :
+                    Uri uri = Uri.parse(getString(R.string.app_url));
+                    Intent openStore=new Intent(Intent.ACTION_VIEW,uri);
+
+                    openStore.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY |
+                            Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
+                            Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+
+                    try {
+                        startActivity(openStore);
+                    }catch (ActivityNotFoundException e){
+                        Log.i("ActError",e.getMessage()+"");
+                    }
+                break;
+
+            case R.id.remove_ad:
+                break;
+        }
+
+
+        return false;
     }
 }
 

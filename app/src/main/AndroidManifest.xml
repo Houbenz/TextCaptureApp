@@ -13,13 +13,20 @@
         android:name="com.google.android.gms.vision.DEPENDENCIES"
         android:value="ocr" />
 
+
+
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/eye"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/eye"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-5859725902066144~1507380339"
+            />
+
         <activity android:name=".CaptureTextActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>

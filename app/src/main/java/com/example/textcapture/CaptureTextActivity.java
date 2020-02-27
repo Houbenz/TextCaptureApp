@@ -15,9 +15,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,6 +23,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.example.textcapture.ui.camera.CameraSource;
@@ -38,11 +36,14 @@ import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class CaptureTextActivity extends AppCompatActivity {
 
@@ -53,6 +54,10 @@ public class CaptureTextActivity extends AppCompatActivity {
     @BindView(R.id.graphicOverlay)
      GraphicOverlay<OcrGraphic> graphicOverlay;
 
+    @BindView(R.id.ret)
+    ImageButton ret;
+
+    private boolean isPictureTaken=false;
 
     private ArrayList<String> texts=new ArrayList<String>();
 
@@ -135,7 +140,7 @@ public class CaptureTextActivity extends AppCompatActivity {
 
         cameraSource = new CameraSource.Builder(getApplicationContext(),textRecognizer)
                 .setFacing(CameraSource.CAMERA_FACING_BACK)
-                .setRequestedPreviewSize(1280,1024)
+                .setRequestedPreviewSize(1280,960)
                 .setRequestedFps(15.0f)
                 .setFlashMode(useFlash ? (Camera.Parameters.FLASH_MODE_AUTO) : null)
                 .setFocusMode(autoFocus ? (Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO):null)
@@ -274,37 +279,57 @@ public class CaptureTextActivity extends AppCompatActivity {
 
 
 */
+        doProcessing();
+
+        return true;
+    }
+
+    private void doProcessing(){
 
         cameraSource.takePicture(() -> {
 
         }, data -> {
 
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inMutable=true;
 
-            Bitmap bitmap= BitmapFactory.decodeByteArray(data,0,data.length,options);
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inMutable=true;
 
-            Frame frame = new Frame.Builder().setBitmap(bitmap).build();
+        Bitmap bitmap= BitmapFactory.decodeByteArray(data,0,data.length,options);
 
-            TextRecognizer textRecognizer = new TextRecognizer.Builder(getApplicationContext()).build();
+        Frame frame = new Frame.Builder().setBitmap(bitmap).build();
 
-            SparseArray<TextBlock>  items =textRecognizer.detect(frame);
+        TextRecognizer textRecognizer = new TextRecognizer.Builder(getApplicationContext()).build();
 
-            cameraSource.stop();
+        SparseArray<TextBlock>  items =textRecognizer.detect(frame);
 
-            Canvas tempCanvas = new Canvas(bitmap);
+        cameraSource.stop();
 
-            tempCanvas.drawBitmap(bitmap,0,0,null);
+        Canvas tempCanvas = new Canvas(bitmap);
 
-            for (int i=0;i<items.size();i++){
-                texts.add(items.get(i).getValue());
-            }
+        tempCanvas.drawBitmap(bitmap,0,0,null);
+
+        ret.setVisibility(View.VISIBLE);
 
 
+        for (int i=0;i<items.size();i++){
+            texts.add(items.get(i).getValue()+"\n");
+        }
         });
+    }
 
 
-        return true;
+    @OnClick(R.id.captureTextBtn)
+    public void takepicture(){
+        doProcessing();
+    }
+
+    @OnClick(R.id.ret)
+    public void returnback(){
+        Intent intent = getIntent();
+        intent.putStringArrayListExtra("texts",texts);
+        intent.putExtra("page",1);
+        setResult(RESULT_OK,intent);
+        finish();
     }
 
 
@@ -315,7 +340,6 @@ public class CaptureTextActivity extends AppCompatActivity {
         intent.putStringArrayListExtra("texts",texts);
         intent.putExtra("page",1);
         setResult(RESULT_OK,intent);
-
         finish();
     }
 

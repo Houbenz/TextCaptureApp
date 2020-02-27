@@ -7,4 +7,8 @@
     <color name="white">#fff</color>
     <color name="grey">#d3d3d3</color>
     <color name="semi_white">#e8e8e8</color>
+    <color name="start_gradient_color">#3A9495</color>
+    <color name="center_color_gradient">#6E6BA0</color>
+    <color name="end_color_gradient">#34436E</color>
+    <color name="black_opac">#80000000</color>
 </resources>
