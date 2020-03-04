@@ -10,7 +10,7 @@
     android:background="@drawable/gradient_background"
     android:orientation="vertical">
 
-    <com.example.textcapture.ui.camera.CameraSourcePreview
+    <com.houbenz.capturetext.ui.camera.CameraSourcePreview
         android:id="@+id/preview"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -26,13 +26,13 @@
         app:layout_constraintVertical_bias="1.0">
 
 
-        <com.example.textcapture.ui.camera.GraphicOverlay
+        <com.houbenz.capturetext.ui.camera.GraphicOverlay
             android:id="@+id/graphicOverlay"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
 
-    </com.example.textcapture.ui.camera.CameraSourcePreview>
+    </com.houbenz.capturetext.ui.camera.CameraSourcePreview>
 
     <ImageButton
         android:id="@+id/captureTextBtn"

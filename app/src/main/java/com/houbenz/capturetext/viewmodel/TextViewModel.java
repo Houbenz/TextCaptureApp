@@ -1,4 +1,4 @@
-package com.example.textcapture.viewmodel;
+package com.houbenz.capturetext.viewmodel;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

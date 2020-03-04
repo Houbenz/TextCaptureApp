@@ -1,4 +1,4 @@
-package com.example.textcapture;
+package com.houbenz.capturetext;
 
 
 import android.content.ClipData;
@@ -15,7 +15,8 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import com.example.textcapture.viewmodel.TextViewModel;
+import com.houbenz.capturetext.R;
+import com.houbenz.capturetext.viewmodel.TextViewModel;
 import com.google.android.material.textfield.TextInputLayout;
 
 import butterknife.BindView;

@@ -1,4 +1,4 @@
-package com.example.textcapture;
+package com.houbenz.capturetext;
 
 import android.content.Context;
 
@@ -22,6 +22,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.example.textcapture", appContext.getPackageName());
+        assertEquals("com.houbenz.textcapture", appContext.getPackageName());
     }
 }

@@ -1,4 +1,4 @@
-package com.example.textcapture;
+package com.houbenz.capturetext;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -8,9 +8,11 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -26,9 +28,10 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import com.example.textcapture.ui.camera.CameraSource;
-import com.example.textcapture.ui.camera.CameraSourcePreview;
-import com.example.textcapture.ui.camera.GraphicOverlay;
+import com.houbenz.capturetext.R;
+import com.houbenz.capturetext.ui.camera.CameraSource;
+import com.houbenz.capturetext.ui.camera.CameraSourcePreview;
+import com.houbenz.capturetext.ui.camera.GraphicOverlay;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.Frame;
@@ -36,8 +39,7 @@ import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 import com.google.android.material.snackbar.Snackbar;
 
-import java.io.File;
-import java.io.FileOutputStream;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -72,11 +74,19 @@ public class CaptureTextActivity extends AppCompatActivity {
     private GestureDetector gestureDetector;
     private ScaleGestureDetector scaleGestureDetector;
 
+    private int fps;
+    private boolean autofocus;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_capture_text);
         ButterKnife.bind(this);
+
+        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("file", Context.MODE_PRIVATE);
+        fps=sharedPreferences.getInt("fps",15);
+        autofocus=sharedPreferences.getBoolean("autofocus",true);
+
 
         boolean autoFocus=true;
         boolean autoFlash=false;
@@ -138,21 +148,21 @@ public class CaptureTextActivity extends AppCompatActivity {
 
         }
 
-        cameraSource = new CameraSource.Builder(getApplicationContext(),textRecognizer)
+        /*cameraSource = new CameraSource.Builder(getApplicationContext(),textRecognizer)
                 .setFacing(CameraSource.CAMERA_FACING_BACK)
                 .setRequestedPreviewSize(1280,960)
                 .setRequestedFps(15.0f)
                 .setFlashMode(useFlash ? (Camera.Parameters.FLASH_MODE_AUTO) : null)
                 .setFocusMode(autoFocus ? (Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO):null)
-                .build();
+                .build();*/
 
 
-        /*cameraSource=new CameraSource.Builder(getApplicationContext(),textRecognizer)
+        cameraSource=new CameraSource.Builder(getApplicationContext(),textRecognizer)
                 .setFacing(CameraSource.CAMERA_FACING_BACK)
                 .setRequestedPreviewSize(1280,1024)
-                .setAutoFocusEnabled(true)
-                .setRequestedFps(15.0f)
-                .build();*/
+                .setRequestedFps(fps)
+                .setFocusMode(autoFocus ? Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO : null)
+                .build();
         textRecognizer.setProcessor(new OcrProcessorDetector(graphicOverlay));
 
     }

@@ -1,11 +1,10 @@
-package com.example.textcapture;
+package com.houbenz.capturetext;
 
 import android.util.Log;
 import android.util.SparseArray;
 
-import com.example.textcapture.ui.camera.GraphicOverlay;
+import com.houbenz.capturetext.ui.camera.GraphicOverlay;
 import com.google.android.gms.vision.Detector;
-import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.TextBlock;
 
 public class OcrProcessorDetector implements Detector.Processor<TextBlock> {

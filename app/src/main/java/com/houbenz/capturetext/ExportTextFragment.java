@@ -1,24 +1,20 @@
-package com.example.textcapture;
+package com.houbenz.capturetext;
 
 
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.example.textcapture.viewmodel.TextViewModel;
-
-import org.w3c.dom.Text;
+import com.houbenz.capturetext.R;
+import com.houbenz.capturetext.viewmodel.TextViewModel;
 
 import java.util.ArrayList;
 
@@ -27,7 +23,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static android.app.Activity.RESULT_OK;
-import static com.example.textcapture.MainActivity.REQUEST_CODE;
 
 
 /**

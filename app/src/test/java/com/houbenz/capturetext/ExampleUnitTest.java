@@ -1,4 +1,4 @@
-package com.example.textcapture;
+package com.houbenz.capturetext;
 
 import org.junit.Test;
 

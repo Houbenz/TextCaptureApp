@@ -1,7 +1,6 @@
-package com.example.textcapture;
+package com.houbenz.capturetext;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -19,8 +18,9 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.MenuItem;
 
-import com.example.textcapture.adapter.PageAdapter;
-import com.example.textcapture.viewmodel.TextViewModel;
+import com.houbenz.capturetext.R;
+import com.houbenz.capturetext.adapter.PageAdapter;
+import com.houbenz.capturetext.viewmodel.TextViewModel;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
 
         //to add the interstitial ad;
         interstitialAd=new InterstitialAd(this);
-        interstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+        interstitialAd.setAdUnitId(getString(R.string.afterscan_id));
         //interstitialAd.loadAd(new AdRequest.Builder().build());
 
         PageAdapter pageAdapter = new PageAdapter(getSupportFragmentManager());
@@ -333,6 +333,11 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
                 break;
 
             case R.id.remove_ad:
+                break;
+
+            case R.id.settings:
+                    Intent intent = new Intent(getApplicationContext(),SettingsActivity.class);
+                    startActivity(intent);
                 break;
         }
 
