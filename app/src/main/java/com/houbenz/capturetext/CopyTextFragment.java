@@ -53,7 +53,7 @@ public class CopyTextFragment extends Fragment {
 
         viewModel= ViewModelProviders.of(getActivity()).get(TextViewModel.class);
 
-        viewModel.getTexts().observe(this,texts ->{
+        viewModel.getTexts().observe(getViewLifecycleOwner(),texts ->{
 
             scannedTextlayout.getEditText().setText("");
             for(String text : texts){

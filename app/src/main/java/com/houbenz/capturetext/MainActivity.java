@@ -23,7 +23,6 @@ import com.houbenz.capturetext.adapter.PageAdapter;
 import com.houbenz.capturetext.viewmodel.TextViewModel;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
@@ -64,8 +63,6 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
     BottomNavigationView bottomNavigationView;
 
 
-    private InterstitialAd interstitialAd;
-
     @BindView(R.id.adView)
     AdView adView;
 
@@ -103,12 +100,6 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
         navigationView.setNavigationItemSelectedListener(this);
 
 
-
-        //to add the interstitial ad;
-        interstitialAd=new InterstitialAd(this);
-        interstitialAd.setAdUnitId(getString(R.string.afterscan_id));
-        //interstitialAd.loadAd(new AdRequest.Builder().build());
-
         PageAdapter pageAdapter = new PageAdapter(getSupportFragmentManager());
 
         viewPager.setAdapter(pageAdapter);
@@ -117,27 +108,6 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
 
 
 
-        //for loading the ad after being shown the first time
-        viewModel.getCurrentPage().observe(this,currentPage -> {
-            viewPager.setCurrentItem(currentPage);
-            if(currentPage == 1 ){
-                interstitialAd.loadAd(new AdRequest.Builder().build());
-                Log.i("LOOL","here");
-            }
-        });
-
-
-        //to show the ad  when the data is exported to the fragment
-        viewModel.getTexts().observe(this,texts ->  {
-            if(texts !=null){
-                if(interstitialAd.isLoaded()){
-                    interstitialAd.show();
-                }else {
-                    Log.i("LOOL","didnt show yet");
-                }
-            }
-
-        });
 
 
         viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
