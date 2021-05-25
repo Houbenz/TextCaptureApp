@@ -4,26 +4,18 @@ package com.houbenz.capturetext;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts.GetContent;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-
-import com.houbenz.capturetext.R;
 import com.houbenz.capturetext.viewmodel.TextViewModel;
-
-import java.util.ArrayList;
-
-import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
-
-import static android.app.Activity.RESULT_OK;
-
 
 /**
  * A simple {@link Fragment} subclass.
@@ -42,51 +34,38 @@ public class ExportTextFragment extends Fragment {
     }
 
 
-    private TextViewModel viewModel;
-
-    @BindView(R.id.scanBtn)
     Button scanBtn;
+    ActivityResultLauncher<Integer> mGetContent ;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
 
 
         View view = inflater.inflate(R.layout.fragment_export_text, container, false);
         ButterKnife.bind(this,view);
 
-        viewModel= ViewModelProviders.of(getActivity()).get(TextViewModel.class);
+        scanBtn = view.findViewById(R.id.scanBtn);
+
+        TextViewModel viewModel = new ViewModelProvider(requireActivity()).get(TextViewModel.class);
+
+        scanBtn.setOnClickListener( v  -> {
+
+            /*Intent intent = new Intent(getActivity(), CaptureTextActivity.class);
+            startActivityForResult(intent, REQUEST_CODE);
+            viewModel.setCurrentPage(COPY_PAGE);*/
+
+            mGetContent.launch(1);
+        });
+
+
+        mGetContent = registerForActivityResult(new TextContract(getActivity(),CaptureTextActivity.class), result ->{
+
+            viewModel.setTexts(result);
+            viewModel.setCurrentPage(COPY_PAGE);
+        });
 
         return view;
     }
 
-    @OnClick(R.id.scanBtn)
-    public void scanText() {
-        Intent intent = new Intent(getActivity(), CaptureTextActivity.class);
-        startActivityForResult(intent, REQUEST_CODE);
-        viewModel.setCurrentPage(COPY_PAGE);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE) {
-
-            if (resultCode == RESULT_OK) {
-                //Received text from capture activity now is being displayed in textview
-                ArrayList<String> texts = data.getStringArrayListExtra("texts");
-
-                if (texts != null && !texts.isEmpty()) {
-
-
-                    //transfer the data to activity and other fragments
-                    viewModel.setTexts(texts);
-
-
-                }
-            }
-        }
-
-
-    }
 }

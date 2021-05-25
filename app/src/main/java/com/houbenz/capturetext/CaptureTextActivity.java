@@ -25,6 +25,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -50,18 +51,17 @@ import butterknife.OnClick;
 public class CaptureTextActivity extends AppCompatActivity {
 
 
-     CameraSource cameraSource;
-    @BindView(R.id.preview)
-     CameraSourcePreview preview;
-    @BindView(R.id.graphicOverlay)
-     GraphicOverlay<OcrGraphic> graphicOverlay;
+     private CameraSource cameraSource;
 
-    @BindView(R.id.ret)
-    ImageButton ret;
+    private CameraSourcePreview preview;
+
+    private GraphicOverlay<OcrGraphic> graphicOverlay;
+
+    private ImageButton ret;
 
     private boolean isPictureTaken=false;
 
-    private ArrayList<String> texts=new ArrayList<String>();
+    private final ArrayList<String> texts=new ArrayList<String>();
 
     private static final int RC_HANDLE_CAMERA_PER= 2;
     private static final int RC_HANDLE_GMS = 9001;
@@ -77,15 +77,51 @@ public class CaptureTextActivity extends AppCompatActivity {
     private int fps;
     private boolean autofocus;
 
+
+
+    private ImageButton captureTextButton;
+
+
+
+    public void takepicture(){
+        doProcessing();
+    }
+
+
+    public void returnback(){
+        Intent intent = getIntent();
+        intent.putStringArrayListExtra("texts",texts);
+        intent.putExtra("page",1);
+        setResult(RESULT_OK,intent);
+        finish();
+    }
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_capture_text);
         ButterKnife.bind(this);
 
+        preview = findViewById(R.id.preview);
+        graphicOverlay = findViewById(R.id.graphicOverlay);
+        ret = findViewById(R.id.ret);
+        captureTextButton=findViewById(R.id.captureTextBtn);
+
+        captureTextButton.setOnClickListener(v -> {
+            takepicture();
+        });
+
+        ret.setOnClickListener(view -> {
+            returnback();
+        });
+
         SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("file", Context.MODE_PRIVATE);
         fps=sharedPreferences.getInt("fps",15);
         autofocus=sharedPreferences.getBoolean("autofocus",true);
+
 
 
         boolean autoFocus=true;
@@ -148,15 +184,6 @@ public class CaptureTextActivity extends AppCompatActivity {
 
         }
 
-        /*cameraSource = new CameraSource.Builder(getApplicationContext(),textRecognizer)
-                .setFacing(CameraSource.CAMERA_FACING_BACK)
-                .setRequestedPreviewSize(1280,960)
-                .setRequestedFps(15.0f)
-                .setFlashMode(useFlash ? (Camera.Parameters.FLASH_MODE_AUTO) : null)
-                .setFocusMode(autoFocus ? (Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO):null)
-                .build();*/
-
-
         cameraSource=new CameraSource.Builder(getApplicationContext(),textRecognizer)
                 .setFacing(CameraSource.CAMERA_FACING_BACK)
                 .setRequestedPreviewSize(1280,1024)
@@ -174,7 +201,9 @@ public class CaptureTextActivity extends AppCompatActivity {
         if (code != ConnectionResult.SUCCESS) {
             Dialog dlg =
                     GoogleApiAvailability.getInstance().getErrorDialog(this, code, RC_HANDLE_GMS);
-            dlg.show();
+
+            if(dlg != null)
+                dlg.show();
         }
 
         if (cameraSource != null) {
@@ -323,24 +352,11 @@ public class CaptureTextActivity extends AppCompatActivity {
 
         for (int i=0;i<items.size();i++){
             texts.add(items.get(i).getValue()+"\n");
+
         }
         });
     }
 
-
-    @OnClick(R.id.captureTextBtn)
-    public void takepicture(){
-        doProcessing();
-    }
-
-    @OnClick(R.id.ret)
-    public void returnback(){
-        Intent intent = getIntent();
-        intent.putStringArrayListExtra("texts",texts);
-        intent.putExtra("page",1);
-        setResult(RESULT_OK,intent);
-        finish();
-    }
 
 
     @Override
