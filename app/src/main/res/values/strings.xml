@@ -21,7 +21,6 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
-    <string name="banner_ad_id">ca-app-pub-5859725902066144/8269542883</string>
-    <!--<string name="afterscan_id">ca-app-pub-5859725902066144/6645276501</string>-->
-    <string name="afterscan_id">ca-app-pub-3940256099942544/1033173712</string>
+    <string name="afterscan_id">ca-app-pub-5859725902066144/6645276501</string>
+    <!--<string name="afterscan_id">ca-app-pub-3940256099942544/1033173712</string>-->
 </resources>
