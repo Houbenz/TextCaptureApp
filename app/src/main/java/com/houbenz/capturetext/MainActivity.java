@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
 
     byte[] data;
 
-    private Uri fileUri;
+    private Uri fileUri1;
 
     private InterstitialAd interstitialAd;
 
