@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager.widget.ViewPager;
 
 import android.Manifest;
@@ -18,18 +18,18 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.MenuItem;
 
-import com.houbenz.capturetext.R;
+import com.google.android.gms.ads.AdError;
+import com.google.android.gms.ads.FullScreenContentCallback;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.houbenz.capturetext.adapter.PageAdapter;
 import com.houbenz.capturetext.viewmodel.TextViewModel;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
-import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity implements  NavigationView.OnNavigationItemSelectedListener {
@@ -43,40 +43,15 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
     byte[] data;
 
     private Uri fileUri;
-/*
-    @BindView(R.id.scanButton)
-    Button scanButton;
-
-    @BindView(R.id.textView)
-    TextView textView;
-
-    @BindView(R.id.saveFile)
-    Button saveData;
-*/
-
-
-    private TextViewModel viewModel;
-
-    @BindView(R.id.viewPager)
-    ViewPager viewPager;
-
-    @BindView(R.id.bottomNavigationView)
-    BottomNavigationView bottomNavigationView;
-
 
     private InterstitialAd interstitialAd;
 
-    @BindView(R.id.adView)
-    AdView adView;
-
-    @BindView(R.id.toolbar)
-     Toolbar toolbar;
-
-    @BindView(R.id.drawerLayout)
+    ViewPager viewPager;
+    BottomNavigationView bottomNavigationView;
+    Toolbar toolbar;
     DrawerLayout drawerLayout;
-
-    @BindView(R.id.navigationView)
     NavigationView navigationView;
+
 
 
     @Override
@@ -85,71 +60,69 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        //to load banner ad
-        MobileAds.initialize(this, initializationStatus -> {
-
-        });
-        adView.loadAd(new AdRequest.Builder().build());
-
-
+        viewPager=findViewById(R.id.viewPager);
+        toolbar=findViewById(R.id.toolbar);
+        drawerLayout=findViewById(R.id.drawerLayout);
+        navigationView=findViewById(R.id.navigationView);
+        bottomNavigationView=findViewById(R.id.bottomNavigationView);
 
         setSupportActionBar(toolbar);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this,drawerLayout,toolbar,
                 R.string.open_navigation,R.string.close_navigation);
 
-        drawerLayout.setDrawerListener(toggle);
+        drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
 
 
+        AdRequest adRequest = new AdRequest.Builder().build();
 
-        //to add the interstitial ad;
-        interstitialAd=new InterstitialAd(this);
-        interstitialAd.setAdUnitId(getString(R.string.afterscan_id));
-        //interstitialAd.loadAd(new AdRequest.Builder().build());
+        InterstitialAd.load(this, getString(R.string.afterscan_id), adRequest, new InterstitialAdLoadCallback() {
+            @Override
+            public void onAdLoaded(@NonNull InterstitialAd tInterstitialAd) {
+                super.onAdLoaded(tInterstitialAd);
+                interstitialAd=tInterstitialAd;
+                addFullScreenCallBackToInterstitial();
+
+                Log.i("RRR","Onloaded interstitial");
+            }
+
+            @Override
+            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                super.onAdFailedToLoad(loadAdError);
+                interstitialAd=null;
+                Log.i("RRR", "onAdFailedToLoad: ");
+            }
+        });
+
 
         PageAdapter pageAdapter = new PageAdapter(getSupportFragmentManager());
 
         viewPager.setAdapter(pageAdapter);
 
-        viewModel= ViewModelProviders.of(this).get(TextViewModel.class);
-
-
-
-        //for loading the ad after being shown the first time
-        viewModel.getCurrentPage().observe(this,currentPage -> {
-            viewPager.setCurrentItem(currentPage);
-            if(currentPage == 1 ){
-                interstitialAd.loadAd(new AdRequest.Builder().build());
-                Log.i("LOOL","here");
-            }
-        });
-
-
+        TextViewModel viewModel = new ViewModelProvider(this).get(TextViewModel.class);
         //to show the ad  when the data is exported to the fragment
-        viewModel.getTexts().observe(this,texts ->  {
-            if(texts !=null){
-                if(interstitialAd.isLoaded()){
-                    interstitialAd.show();
-                }else {
-                    Log.i("LOOL","didnt show yet");
-                }
-            }
+        viewModel.getTexts().observe(this, texts ->  {
+            if(texts !=null && interstitialAd != null)
+                interstitialAd.show(MainActivity.this);
+            else
+                Log.i("LOOL","didnt show yet");
+
 
         });
 
+        viewModel.getCurrentPage().observe(this,page -> {
+            viewPager.setCurrentItem(page);
+        });
 
-        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 switch (position){
+                    case 0: bottomNavigationView.getSelectedItemId(); break;
 
-                    case 0:
-
-                        bottomNavigationView.getSelectedItemId();
-
-                        ; break;
                     case 1: break;
                 }
             }
@@ -185,6 +158,33 @@ public class MainActivity extends AppCompatActivity implements  NavigationView.O
             }
 
             return false;});
+
+    }
+
+
+    void addFullScreenCallBackToInterstitial(){
+        interstitialAd.setFullScreenContentCallback(new FullScreenContentCallback(){
+            @Override
+            public void onAdDismissedFullScreenContent() {
+                // Called when fullscreen content is dismissed.
+                Log.d("TAG", "The ad was dismissed.");
+            }
+
+            @Override
+            public void onAdFailedToShowFullScreenContent(AdError adError) {
+                // Called when fullscreen content failed to show.
+                Log.d("TAG", "The ad failed to show.");
+            }
+
+            @Override
+            public void onAdShowedFullScreenContent() {
+                // Called when fullscreen content is shown.
+                // Make sure to set your reference to null so you don't
+                // show it a second time.
+                interstitialAd = null;
+                Log.d("TAG", "The ad was shown.");
+            }
+        });
 
     }
 
